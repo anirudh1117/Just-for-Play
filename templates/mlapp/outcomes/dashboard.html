@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Performance Dashboard</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .kpi { display: inline-block; margin-right: 40px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #f4f4f4; }
+        .win { color: green; }
+        .loss { color: red; }
+    </style>
+</head>
+<body>
+
+<h2>📊 Trading Performance Dashboard</h2>
+
+<div class="kpis">
+    <div class="kpi"><b>Total Trades</b><br>{{ summary.trades }}</div>
+    <div class="kpi"><b>Win Rate</b><br>{{ summary.win_rate_pct }}%</div>
+    <div class="kpi"><b>Expectancy (R)</b><br>{{ summary.expectancy }}</div>
+    <div class="kpi"><b>Max Drawdown (R)</b><br>{{ summary.max_drawdown_R }}</div>
+</div>
+
+<h3>Recent Trades</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Symbol</th>
+            <th>Exit</th>
+            <th>R</th>
+            <th>Hold (min)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in recent_trades %}
+        <tr>
+            <td>{{ t.date }}</td>
+            <td>{{ t.symbol }}</td>
+            <td>{{ t.exit_reason }}</td>
+            <td class="{% if t.R_multiple > 0 %}win{% else %}loss{% endif %}">
+                {{ t.R_multiple }}
+            </td>
+            <td>{{ t.holding_minutes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

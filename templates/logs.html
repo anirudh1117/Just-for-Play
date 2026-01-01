@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Job #{{ job.id }} — {{ job.get_job_type_display }}</h2>
+<p>Status: {{ job.status }}</p>
+
+<div id="log-box" class="log-box">
+    {% for log in logs %}
+        <div>[{{ log.timestamp }}] {{ log.message }}</div>
+    {% endfor %}
+</div>
+
+<script>
+    // Live WebSocket updates (Step 6 will implement backend)
+    const jobId = "{{ job.id }}";
+    const logBox = document.getElementById("log-box");
+
+    let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+    let socket = new WebSocket(ws_scheme + '://' + window.location.host + '/ws/job/' + jobId + '/');
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const msg = data.message;
+        const ts = data.timestamp;
+        logBox.innerHTML += `<div>[${ts}] ${msg}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    };
+
+    socket.onerror = function() {
+        console.log("WebSocket error - using fallback polling");
+    };
+</script>
+
+{% endblock %}

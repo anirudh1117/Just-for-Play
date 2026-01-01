@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Optimization Result #{{ run.id }}</h2>
+
+<h4>Best Parameters</h4>
+<ul>
+  <li>Entry Rule: {{ best_params.entry_rule }}</li>
+  <li>SL Multiplier: {{ best_params.sl_mult }}</li>
+  <li>TP Multiplier: {{ best_params.tp_mult }}</li>
+  <li>Confidence Threshold: {{ best_params.confidence }}</li>
+  <li>Holding Time: {{ best_params.hold_time }} minutes</li>
+</ul>
+
+<h4>Best Metrics</h4>
+<ul>
+  <li>Sharpe Ratio: {{ best_metrics.sharpe_ratio|floatformat:3 }}</li>
+  <li>Win Rate: {{ best_metrics.win_rate|floatformat:2 }}%</li>
+  <li>Expectancy: {{ best_metrics.expectancy|floatformat:3 }}</li>
+  <li>Max Drawdown: {{ best_metrics.max_drawdown }}</li>
+  <li>Total Trades: {{ best_metrics.total_trades }}</li>
+</ul>
+
+<hr>
+
+<h4>All Strategy Results (Top 20)</h4>
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      <th>Score</th>
+      <th>Entry Rule</th>
+      <th>SL</th>
+      <th>TP</th>
+      <th>Conf</th>
+      <th>Hold</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in full_results|slice:":20" %}
+    <tr>
+      <td>{{ r.score|floatformat:3 }}</td>
+      <td>{{ r.params.entry_rule }}</td>
+      <td>{{ r.params.sl_mult }}</td>
+      <td>{{ r.params.tp_mult }}</td>
+      <td>{{ r.params.confidence }}</td>
+      <td>{{ r.params.hold_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

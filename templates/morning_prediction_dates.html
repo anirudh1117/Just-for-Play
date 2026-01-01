@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Morning Prediction History</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>View Picks</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for d in dates %}
+        <tr>
+            <td>{{ d }}</td>
+            <td>
+                <a href="{% url 'morning_prediction_detail' d %}"
+                   class="btn btn-primary btn-sm">
+                    View Final Picks
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+{% endblock %}

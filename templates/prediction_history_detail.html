@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Predictions for {{ pred_date }}</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Symbol</th>
+            <th>Confidence</th>
+            <th>Entry</th>
+            <th>Target</th>
+            <th>Stoploss</th>
+            <th>Close</th>
+            <th>VWAP</th>
+            <th>ATR</th>
+            <th>Volume</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in predictions %}
+        <tr>
+            <td>{{ p.instrument.symbol }}</td>
+            <td>{{ p.confidence }}%</td>
+            <td>{{ p.entry }}</td>
+            <td>{{ p.target }}</td>
+            <td>{{ p.stoploss }}</td>
+            <td>{{ p.close }}</td>
+            <td>{{ p.vwap }}</td>
+            <td>{{ p.atr_14 }}</td>
+            <td>{{ p.volume }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}

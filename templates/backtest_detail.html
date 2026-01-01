@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Backtest Details (Run #{{ run.id }})</h2>
+
+<h4>Summary</h4>
+<ul>
+  <li><b>Symbols:</b> {{ run.symbols }}</li>
+  <li><b>Date Range:</b> {{ run.start_date }} → {{ run.end_date }}</li>
+  <li><b>Win Rate:</b> {{ run.win_rate }}%</li>
+  <li><b>Total Trades:</b> {{ run.total_trades }}</li>
+  <li><b>Wins:</b> {{ run.wins }}</li>
+  <li><b>Losses:</b> {{ run.losses }}</li>
+  <li><b>No Trades:</b> {{ run.zeroes }}</li>
+  <li><b>Sharpe Ratio:</b> {{ metrics.metrics.sharpe_ratio }}</li>
+  <li><b>Max Drawdown:</b> {{ metrics.metrics.max_drawdown }}</li>
+</ul>
+
+<hr>
+
+<h4>Downloads</h4>
+<a href="/static/backtest_exports/{{ run.id }}/daily_trades.csv"
+   class="btn btn-primary btn-sm" download>Daily Trades CSV</a>
+
+<a href="/static/backtest_exports/{{ run.id }}/per_symbol_stats.csv"
+   class="btn btn-primary btn-sm" download>Symbol Stats CSV</a>
+
+<a href="/static/backtest_exports/{{ run.id }}/equity_curve.csv"
+   class="btn btn-primary btn-sm" download>Equity Curve CSV</a>
+
+<a href="/static/backtest_exports/{{ run.id }}/daily_returns.csv"
+   class="btn btn-primary btn-sm" download>Daily Returns CSV</a>
+
+<a href="/static/backtest_exports/{{ run.id }}/summary.json"
+   class="btn btn-primary btn-sm" download>Full Summary JSON</a>
+<hr>
+
+<h4>Equity Curve</h4>
+<img src="/static/backtest_equity/equity_{{ run.id }}.png" width="800">
+
+<hr>
+
+<h4>Per-Symbol Performance</h4>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Trades</th>
+      <th>Net</th>
+      <th>Avg</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for row in metrics.metrics.per_symbol %}
+    <tr>
+      <td>{{ row.symbol }}</td>
+      <td>{{ row.count }}</td>
+      <td>{{ row.net }}</td>
+      <td>{{ row.avg }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+
+<h4>Daily Trades</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Trades</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for day in details %}
+    <tr>
+      <td>{{ day.date }}</td>
+      <td>
+        <pre>{{ day.results|safe }}</pre>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

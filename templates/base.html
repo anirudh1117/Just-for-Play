@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #fafafa; }
+        .container { max-width: 900px; margin: auto; }
+        .btn { 
+            padding: 10px 18px; 
+            background: #0066ff; 
+            color: white; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            margin-right: 8px;
+        }
+        .btn:hover { background: #004ccc; }
+        .btn-danger { background: #e63946; }
+        .btn-secondary { background: #555; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .log-box {
+            background: #111; color: #0f0; padding: 15px; margin-top: 20px; 
+            height: 400px; overflow-y: scroll; font-family: monospace;
+        }
+        .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trading System</h1>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

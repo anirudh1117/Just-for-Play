@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<h3>Actions</h3>
+
+<div class="btn-group">
+<a class="btn" href="{% url 'trigger_fetch_today' %}">Fetch Today's Data</a>
+<a class="btn" href="{% url 'trigger_compute_features' %}">Compute Features</a>
+<a class="btn" href="{% url 'trigger_train_model' %}">Train Model</a>
+<a class="btn" href="{% url 'trigger_evening_predict' %}">Evening Prediction</a>
+<a class="btn" href="{% url 'trigger_morning_confirm' %}">▶ Start Morning Data Stream</a>
+<a class="btn" href="{% url 'trigger_instrument_sync' %}">Sync Instruments</a>
+<a href="{% url 'prediction_history_list' %}" class="btn btn-info">Prediction History</a>
+<a href="{% url 'morning_prediction_dates' %}" class="btn btn-warning">Morning Predictions</a>
+<a href="{% url 'backtest_run_form' %}" class="btn btn-warning">Run Backtest</a>
+<a href="{% url 'optimizer_list' %}" class="btn btn-warning mb-3">View Strategy Optimizer</a>
+<a href="{% url 'trigger_optimize_strategy' %}" class="btn btn-danger mb-3">Run Strategy Optimization</a>
+<a href="{% url 'upstox_login' %}" class="btn btn-primary">Connect Upstox</a>
+<a href="{% url 'trigger_historical_backfill' %}" class="btn btn-warning">Run Historical Backfill</a>
+<a href="{% url 'trigger_sync_holidays' %}" class="btn btn-info">Sync NSE Holidays</a>
+<a href="/mlapp/outcomes/dashboard/" class="btn btn-info">📈 Outcome Dashboard</a>
+
+
+
+
+
+</div>
+<hr>
+
+<h3>Recent Jobs</h3>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Action</th>
+    </tr>
+    {% for job in jobs %}
+    <tr>
+        <td>{{ job.id }}</td>
+        <td>{{ job.get_job_type_display }}</td>
+        <td>{{ job.status }}</td>
+        <td>{{ job.created_at }}</td>
+        <td><a class="btn-secondary" href="{% url 'job_detail' job.id %}">View Logs</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>📈 Trading Workflow</h3>
+
+<form method="post" action="{% url 'trigger_morning_inference' %}">
+  {% csrf_token %}
+  <button type="submit">▶ Run Morning Inference</button>
+</form>
+
+<form method="post" action="{% url 'trigger_outcome_evaluation' %}">
+  {% csrf_token %}
+  <button type="submit">📊 Run Outcome Evaluation</button>
+</form>
+
+<form method="post" action="{% url 'trigger_metrics_computation' %}">
+  {% csrf_token %}
+  <button type="submit">📉 Compute Metrics</button>
+</form>
+
+
+{% endblock %}

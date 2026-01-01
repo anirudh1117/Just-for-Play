@@ -1,0 +1,86 @@
+import pandas as pd
+from jobs.utils import append_job_log
+
+from mlapp.features.loaders import load_candles_df
+from mlapp.features.indicators import add_price_features, add_volume_features, add_volatility_features, add_vwap, add_momentum_features
+from mlapp.features.time_features import add_time_features
+from mlapp.features.targets import (
+    add_forward_returns,
+    add_binary_targets,
+    add_vol_adj_targets,
+    clean_targets
+)
+
+
+
+class FeatureEngine:
+    """
+    Orchestrates the entire feature computation pipeline.
+    """
+
+    def __init__(self, job_id=None, days=90):
+        self.job_id = job_id
+        self.days = days
+        self.df = None
+
+    def log(self, msg):
+        append_job_log(self.job_id, msg)
+
+    # ---------------------------------------------------------
+    # Pipeline steps
+    # ---------------------------------------------------------
+
+    def load_raw_data(self):
+        self.log(f"Loading candles for last {self.days} days...")
+        self.df = load_candles_df(self.days)
+        self.log(f"Loaded {len(self.df):,} candles.")
+
+    def compute_base_indicators(self):
+        self.log("Computing price features...")
+        self.df = add_price_features(self.df)
+
+        self.log("Computing volatility features...")
+        self.df = add_volatility_features(self.df)
+
+        self.log("Computing volume features...")
+        self.df = add_volume_features(self.df)
+
+        self.log("Computing VWAP...")
+        self.df = add_vwap(self.df)
+
+        self.log("Computing momentum features (RSI, EMA, MACD, StochRSI)...")
+        self.df = add_momentum_features(self.df)
+
+
+
+
+    def compute_time_features(self):
+        self.log("Adding time features...")
+        self.df = add_time_features(self.df)
+
+    # ---------------------------------------------------------
+    # Run full pipeline
+    # ---------------------------------------------------------
+
+    def run(self):
+        self.load_raw_data()
+        self.compute_base_indicators()
+        self.compute_time_features()
+    
+        self.log("Computing forward returns...")
+        self.df = add_forward_returns(self.df)
+    
+        self.log("Computing binary targets...")
+        self.df = add_binary_targets(self.df)
+    
+        self.log("Computing volatility-adjusted targets...")
+        self.df = add_vol_adj_targets(self.df)
+    
+        self.log("Cleaning noisy rows...")
+        self.df = clean_targets(self.df)
+    
+        self.log(f"Final dataset ready: {self.df.shape}")
+        return self.df
+
+    
+    

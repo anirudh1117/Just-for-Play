@@ -1,0 +1,15 @@
+LGBM_PARAMS = {
+    "objective": "binary",
+    "boosting_type": "gbdt",
+    "learning_rate": 0.03,
+    "num_leaves": 64,
+    "max_depth": -1,
+    "min_data_in_leaf": 200,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "lambda_l1": 0.1,
+    "lambda_l2": 0.1,
+    "metric": ["auc", "binary_logloss"],
+    "verbosity": -1,
+}

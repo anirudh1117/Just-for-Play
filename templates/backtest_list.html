@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Backtest Runs</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Symbols</th>
+      <th>Date Range</th>
+      <th>Win Rate</th>
+      <th>Total Trades</th>
+      <th>View</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for run in runs %}
+    <tr>
+      <td>{{ run.id }}</td>
+      <td>{{ run.symbols }}</td>
+      <td>{{ run.start_date }} → {{ run.end_date }}</td>
+      <td>{{ run.win_rate }}%</td>
+      <td>{{ run.total_trades }}</td>
+      <td>
+        <a href="{% url 'backtest_detail' run.id %}" class="btn btn-primary btn-sm">
+          View
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

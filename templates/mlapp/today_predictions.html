@@ -1,0 +1,21 @@
+<h2>Morning Predictions — {{ date }}</h2>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Rank</th>
+    <th>Symbol</th>
+    <th>Probability</th>
+  </tr>
+
+  {% for p in predictions %}
+  <tr>
+    <td>{{ p.rank }}</td>
+    <td>{{ p.symbol }}</td>
+    <td>{{ p.probability|floatformat:3 }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3">No predictions available</td>
+  </tr>
+  {% endfor %}
+</table>

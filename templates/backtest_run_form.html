@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Run New Backtest</h2>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    {{ form.symbols.label_tag }}
+    {{ form.symbols }}
+  </div>
+
+  <div class="mb-3">
+    {{ form.start_date.label_tag }}
+    {{ form.start_date }}
+  </div>
+
+  <div class="mb-3">
+    {{ form.end_date.label_tag }}
+    {{ form.end_date }}
+  </div>
+
+  <div class="form-check mb-3">
+    {{ form.strict_mode }} {{ form.strict_mode.label_tag }}
+  </div>
+
+  <button type="submit" class="btn btn-primary">Run Backtest</button>
+</form>
+{% endblock %}
