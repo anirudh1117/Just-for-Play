@@ -127,26 +127,34 @@ class UpstoxClient:
         to_date: date,
     ):
         """
-        Fetch historical candles using Upstox v3 API.
+        Fetch historical intraday candles from Upstox v3.
 
-        v3 endpoint contract:
-        /v3/historical-candle/{instrument_key}/{interval}/{to_date}/{from_date}
+        Logical rules:
+        - from_date <= to_date
+        - (to_date - from_date).days <= 30
 
-        IMPORTANT:
-        - Dates must be YYYY-MM-DD
-        - interval must be one of Upstox-supported intervals ("1minute", "5minute", etc.)
-        - Response ordering is exchange-defined; caller must NOT assume sorting
+        Transport rule (Upstox):
+        - URL order = {to_date}/{from_date}
         """
 
+        # -------- validation (fail fast) --------
+        if from_date > to_date:
+            raise ValueError(
+                f"Invalid date range: from_date {from_date} > to_date {to_date}"
+            )
+
+        if (to_date - from_date).days > 30:
+            raise ValueError(
+                f"Date window too large for Upstox v3: "
+                f"{from_date} → {to_date}"
+            )
+
+        # -------- Upstox v3 URL (NOTE ORDER) --------
         path = (
             f"/historical-candle/"
-            f"{instrument_key}/"
-            f"minutes/"
-            f"{interval}/"
-            f"{to_date.isoformat()}/"
-            f"{from_date.isoformat()}"
+            f"{instrument_key}/minutes/{interval}/"
+            f"{to_date}/{from_date}"
         )
-
 
         return self._get(path)
 

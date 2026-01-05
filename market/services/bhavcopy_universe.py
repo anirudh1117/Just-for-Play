@@ -15,7 +15,7 @@ from jobs.utils import append_job_log
 # -------------------------------------------------------------------
 MIN_CMP = 50.0
 MAX_CMP = 200.0
-MIN_VOLUME = 10_000
+MIN_VOLUME = 15_000
 DEFAULT_LIMIT = 500
 
 ASSETS_DIR = os.path.join(settings.BASE_DIR, "assets")

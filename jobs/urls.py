@@ -21,6 +21,7 @@ urlpatterns = [
     path("optimize/", views.trigger_optimize_strategy, name="trigger_optimize_strategy"),
     path("historical-backfill/", views.trigger_historical_backfill, name="trigger_historical_backfill"),
     path("sync-holidays/", views.trigger_sync_holidays, name="trigger_sync_holidays"),
+    path("gap-repair/", views.trigger_gap_repair, name="trigger_gap_repair"),
     path("run-morning-inference/", views.trigger_morning_inference, name="trigger_morning_inference"),
     path("run-outcome-evaluation/", views.trigger_outcome_evaluation, name="trigger_outcome_evaluation"),
     path("run-metrics-computation/", views.trigger_metrics_computation, name="trigger_metrics_computation"),

@@ -12,7 +12,7 @@ from mlapp.training.dataset_prep import clean_dataset
 from mlapp.training.cv_generator import generate_time_cv_splits
 from mlapp.training.params import LGB_PARAMS
 from mlapp.training.constants import TARGET_COL, get_feature_columns
-from training.evaluation import evaluate_trading_performance
+from mlapp.training.evaluation import evaluate_trading_performance
 
 # ---------------------------------------------------------
 # CONSTANTS

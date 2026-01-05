@@ -96,36 +96,31 @@ class UpstoxToken(models.Model):
 # HISTORICAL BACKFILL STATE (PER INSTRUMENT + INTERVAL)
 # -----------------------------------------------------------------------------
 class HistoricalBackfillState(models.Model):
-    """
-    Tracks resumable backfill progress per instrument AND interval.
-    """
+    instrument = models.ForeignKey(
+        "Instrument",
+        on_delete=models.CASCADE,
+        related_name="backfill_states",
+    )
 
-    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
     interval = models.CharField(max_length=10)
 
+    # Progress tracking
     last_fetched_date = models.DateField(null=True, blank=True)
-
-    retry_count = models.PositiveIntegerField(default=0)
-    last_error = models.TextField(blank=True, null=True)
-    failed_until = models.DateTimeField(null=True, blank=True)
-
-    total_days = models.PositiveIntegerField(default=0)
-    completed_days = models.PositiveIntegerField(default=0)
     started_at = models.DateTimeField(null=True, blank=True)
     last_progress_at = models.DateTimeField(null=True, blank=True)
+
+    # Failure handling
+    retry_count = models.PositiveIntegerField(default=0)
+    last_error = models.TextField(null=True, blank=True)
+    failed_until = models.DateTimeField(null=True, blank=True)
+
+    # Metadata (window-based)
+    window_days = models.PositiveIntegerField(default=30)
 
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["instrument", "interval"],
-                name="unique_backfill_state_per_interval",
-            )
-        ]
-
-    def __str__(self):
-        return f"BackfillState({self.instrument.symbol}, {self.interval})"
+        unique_together = ("instrument", "interval")
 
 
 # -----------------------------------------------------------------------------

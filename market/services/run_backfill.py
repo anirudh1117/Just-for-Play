@@ -17,10 +17,10 @@ def run(job_id=None):
         append_job_log(job_id, f"Selected EQ: {inst.symbol} {inst.instrument_key}")
 
     today = date.today()
+    end = today - timedelta(days=1)
 
     for inst in instruments:
         for interval, years in [
-            #(INTERVAL_1MIN, 1),
             (INTERVAL_5MIN, 1),
         ]:
             state, _ = HistoricalBackfillState.objects.get_or_create(
@@ -28,24 +28,19 @@ def run(job_id=None):
                 interval=interval,
             )
 
-            end = today - timedelta(days=1)
-
-            if state and state.last_fetched_date:
+            # Determine start date
+            if state.last_fetched_date:
                 start = state.last_fetched_date + timedelta(days=1)
             else:
                 start = today - timedelta(days=365 * years)
 
             if start > end:
                 continue
-        
-            total_days = (end - start).days + 1
-            if total_days <= 0:
-                continue
-            
-            state.total_days = total_days
-            state.completed_days = 0
-            state.started_at = timezone.now()
-            state.save()
+
+            # Initialize run metadata only once
+            if not state.started_at:
+                state.started_at = timezone.now()
+                state.save(update_fields=["started_at"])
 
             append_job_log(
                 job_id,

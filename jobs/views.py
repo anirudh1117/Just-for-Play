@@ -8,6 +8,7 @@ from .tasks import optimize_strategy_async, run_job
 from market.constants import (
     JOB_FETCH_TODAY,
     JOB_COMPUTE_FEATURES,
+    JOB_GAP_REPAIR,
     JOB_SYNC_HOLIDAYS,
     JOB_TRAIN_MODEL,
     JOB_EVENING_PREDICT,
@@ -216,6 +217,13 @@ def trigger_metrics_computation(request):
     job = _create_and_run(
         job_type=JOB_METRICS_COMPUTE,
         func_path="mlapp.outcomes.run_daily_metrics.run"
+    )
+    return redirect(reverse("job_detail", kwargs={"job_id": job.id}))
+
+def trigger_gap_repair(request):
+    job = _create_and_run(
+        job_type=JOB_GAP_REPAIR,
+        func_path="market.services.run_gap_repair.run"
     )
     return redirect(reverse("job_detail", kwargs={"job_id": job.id}))
 
