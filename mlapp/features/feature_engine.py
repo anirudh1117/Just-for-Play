@@ -10,6 +10,7 @@ from mlapp.features.targets import (
     add_vol_adj_targets,
     clean_targets
 )
+from mlapp.training.label_generator import generate_trade_labels
 
 
 
@@ -81,6 +82,59 @@ class FeatureEngine:
     
         self.log(f"Final dataset ready: {self.df.shape}")
         return self.df
+    
+    def run_on_df1(self, df: pd.DataFrame):
+        """
+        Run full feature + target pipeline on a provided candle DataFrame.
+
+        This is used by batch per-instrument computation.
+        """
+        self.df = df
+
+        self.compute_base_indicators()
+        self.compute_time_features()
+
+        self.log("Computing forward returns...")
+        self.df = add_forward_returns(self.df)
+
+        self.log("Computing binary targets...")
+        self.df = add_binary_targets(self.df)
+
+        self.log("Computing volatility-adjusted targets...")
+        self.df = add_vol_adj_targets(self.df)
+
+        self.log("Cleaning noisy rows...")
+        self.df = clean_targets(self.df)
+
+        df = df.sort_values(["symbol", "ts"]).reset_index(drop=True)
+
+        self.log("Label generationws...")
+        self.df = generate_trade_labels(self.df)
+
+        self.log(f"Final dataset ready: {self.df.shape}")
+        return self.df
+    
+    def run_on_df(self, df):
+        raw_df = df.sort_values(["symbol", "ts"]).reset_index(drop=True)
+    
+        # 1. FEATURES (past only)
+        self.df = raw_df.copy()
+        self.compute_base_indicators()
+        self.compute_time_features()
+        features_df = self.df.copy()
+    
+        # 2. LABELS (future only)
+        labels_df = generate_trade_labels(raw_df)
+    
+        # 3. MERGE
+        self.df = features_df.merge(
+            labels_df[["symbol", "ts", "target_up_5m"]],
+            on=["symbol", "ts"],
+            how="inner"
+        )
+    
+        return self.df
+
 
     
     

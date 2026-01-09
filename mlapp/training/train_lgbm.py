@@ -1,6 +1,7 @@
 import os
 import time
 import pickle
+import glob
 import pandas as pd
 import lightgbm as lgb
 import numpy as np
@@ -29,12 +30,13 @@ MODEL_DIR = "mlapp/models_store"
 def _get_latest_feature_df(job_id):
     append_job_log(job_id, f"Loading features from: {FEATURE_PATH}")
 
-    if not os.path.exists(FEATURE_PATH):
-        raise Exception(
-            "Feature file not found. Run 'Compute Features' job first."
-        )
+    files = glob.glob("mlapp/cache/features/*_5m.parquet")
 
-    df = pd.read_parquet(FEATURE_PATH)
+    dfs = []
+    for f in files:
+        dfs.append(pd.read_parquet(f))
+    
+    df = pd.concat(dfs, ignore_index=True)
     append_job_log(job_id, f"Loaded DataFrame shape: {df.shape}")
     return df
 
@@ -109,15 +111,19 @@ def run(job_id=None):
         lgb_train = lgb.Dataset(X_train, y_train)
         lgb_valid = lgb.Dataset(X_valid, y_valid, reference=lgb_train)
 
+        callbacks = [
+            lgb.early_stopping(stopping_rounds=100, verbose=False)
+        ]
+
         model = lgb.train(
             params,
             lgb_train,
             valid_sets=[lgb_valid],
             valid_names=["valid"],
             num_boost_round=2000,
-            early_stopping_rounds=100,
-            verbose_eval=False,
+            callbacks=callbacks,
         )
+
 
         preds = model.predict(X_valid)
         auc = roc_auc_score(y_valid, preds)
@@ -159,8 +165,8 @@ def run(job_id=None):
         final_params,
         lgb_full,
         num_boost_round=500,
-        verbose_eval=False,
     )
+
 
     append_job_log(job_id, "Final model training completed")
 

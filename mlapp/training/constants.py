@@ -1,4 +1,4 @@
-TARGET_COL = "label"
+TARGET_COL = "target_up_5m"
 
 META_COLS = [
     "symbol",

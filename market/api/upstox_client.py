@@ -157,6 +157,29 @@ class UpstoxClient:
         )
 
         return self._get(path)
+    
+    def fetch_today_candles(
+        self,
+        instrument_key: str,
+        interval: str
+    ):
+        """
+        Fetch Today's intraday candles from Upstox v3.
+
+        Logical rules:
+        - from_date <= to_date
+        - (to_date - from_date).days <= 30
+
+        Transport rule (Upstox):
+        - URL order = {to_date}/{from_date}
+        """
+       
+        path = (
+            f"/historical-candle/intraday/"
+            f"{instrument_key}/minutes/{interval}/"
+        )
+
+        return self._get(path)
 
     def fetch_ltp(self, instrument_key: str):
         """

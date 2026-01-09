@@ -35,6 +35,10 @@ def _load_csv(path: str) -> list[dict]:
 def _paths(trade_date: date):
     ddmmyyyy = trade_date.strftime("%d%m%Y")
     return (
+        os.path.join(ASSETS_DIR, f"pr02012026.csv"),  # prices
+        os.path.join(ASSETS_DIR, f"pd02012026.csv"),  # series
+    )
+    return (
         os.path.join(ASSETS_DIR, f"pr{ddmmyyyy}.csv"),  # prices
         os.path.join(ASSETS_DIR, f"pd{ddmmyyyy}.csv"),  # series
     )

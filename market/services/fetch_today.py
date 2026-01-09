@@ -6,8 +6,9 @@ from django.db import transaction
 
 from market.models import Instrument, Candle
 from market.api.upstox_client import UpstoxClient
-from market.constants import EXCHANGE_NSE, INSTRUMENT_EQ, INSTRUMENT_INDEX, INTERVAL_1MIN
+from market.constants import EXCHANGE_NSE, INSTRUMENT_EQ, INSTRUMENT_INDEX, INTERVAL_1MIN, INTERVAL_5MIN
 from jobs.utils import append_job_log
+from market.services.bhavcopy_universe import get_bhavcopy_filtered_universe
 from market.services.universe_selector import get_phase1_universe
 
 
@@ -18,6 +19,8 @@ from market.services.universe_selector import get_phase1_universe
 # ---------------------------------------------------------------------
 
 from django.db.models import Q
+
+from market.utils import normalize_ts
 
 def get_universe():
     """
@@ -52,16 +55,12 @@ def save_candles_for_symbol(inst, candles_data, job_id):
     with transaction.atomic():
         for c in candles_data:
             try:
-                raw_ts = parse_datetime(c[0])
-                if raw_ts is None:
-                    raise ValueError(f"Invalid timestamp: {c[0]}")
-
-                ts_utc = raw_ts.astimezone(utc) if raw_ts.tzinfo else raw_ts.replace(tzinfo=utc)
+                ts = normalize_ts(c[0])
 
                 Candle.objects.update_or_create(
                     instrument=inst,
-                    ts=ts_utc,
-                    interval=INTERVAL_1MIN,
+                    ts=ts,
+                    interval=INTERVAL_5MIN,
                     defaults={
                         "open": c[1],
                         "high": c[2],
@@ -89,7 +88,7 @@ def run(job_id=None):
     append_job_log(job_id, "Starting fetch_today pipeline...")
     append_job_log(job_id, f"Fetching 1-minute candles for {today}")
 
-    instruments = get_phase1_universe(limit=250)
+    instruments = get_bhavcopy_filtered_universe(job_id)
     append_job_log(job_id, f"Universe Size: {len(instruments)} instruments")
 
     count = 0
@@ -100,11 +99,9 @@ def run(job_id=None):
         last_processed_key = inst.instrument_key
 
         try:
-            resp = client.fetch_historical_candles(
+            resp = client.fetch_today_candles(
                 instrument_key=inst.instrument_key,
-                interval=INTERVAL_1MIN,
-                from_date=date.today(),
-                to_date=date.today(),
+                interval=INTERVAL_5MIN
             )
 
 

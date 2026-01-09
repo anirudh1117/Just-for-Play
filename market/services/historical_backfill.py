@@ -13,6 +13,8 @@ from jobs.utils import append_job_log
 from calendar import monthrange
 from datetime import date, timedelta
 
+from market.utils import normalize_ts
+
 
 # -------------------------------------------------------------------
 # Helper: split date range into Upstox-compliant windows (≤30 days)
@@ -135,7 +137,7 @@ def backfill_instrument(
                 candle_objs.append(
                     Candle(
                         instrument=inst,
-                        ts=c[0],          # timestamp (ISO / tz-aware from Upstox)
+                        ts=normalize_ts(c[0]),          # timestamp (ISO / tz-aware from Upstox)
                         open=c[1],
                         high=c[2],
                         low=c[3],

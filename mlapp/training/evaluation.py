@@ -19,6 +19,11 @@ def evaluate_trading_performance(
 
     results = []
 
+    if "target_up_5m" not in df.columns:
+        raise Exception(
+            "Expected column 'target_up_5m' not found in dataframe."
+        )
+
     for th in thresholds:
         mask = probs >= th
         trades = df[mask]
@@ -26,7 +31,7 @@ def evaluate_trading_performance(
         if len(trades) == 0:
             continue
 
-        win_rate = trades["label"].mean()
+        win_rate = trades["target_up_5m"].mean()
         loss_rate = 1 - win_rate
 
         ev = (win_rate * reward_pct) - (loss_rate * risk_pct)
